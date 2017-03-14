@@ -1,0 +1,56 @@
+---
+title: "Capture Output - Problem"
+author: "S.B."
+date: "14 marzo 2017"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+Testing  Rstudio Capture output problem
+
+Using _caret_ package and _iris_ dataset to run the example
+```{r cars}
+library(caret)
+set.seed(3456)
+trainIndex <- createDataPartition(iris$Species, p = .8, 
+                                  list = FALSE, 
+                                  times = 1)
+
+training <- iris[ trainIndex,]
+testing  <- iris[-trainIndex,]
+fitControl <- trainControl(## 10-fold CV
+                           method = "repeatedcv",
+                           number = 10,
+                           ## repeated ten times
+                           repeats = 10)
+x = as.matrix(training[,-5])
+y = training$Species
+
+ff<-"rf"
+ER.cv<-list() # risultati k-fold CV svm k=10, repeated=2
+for (i in seq(1,2,1)){
+    cat('Round: ',i,'\n')
+    cv <- train(x,factor(y),method=ff,
+                trControl=fitControl,
+                allowParallel=TRUE) 
+    ER.cv[[length(ER.cv)+1]]<-cv$finalModel
+}
+```
+
+printing
+
+```{r ModelInfo, warning=FALSE,message=FALSE,echo=F,fig.width=9,fig.height=5}
+for (i in seq(1:length(ER.cv))){
+  cat(paste('SOGLIA',i,sep=':'))
+  cat('\n')
+  print(ER.cv[[i]])
+  cat('\n')
+}
+```
